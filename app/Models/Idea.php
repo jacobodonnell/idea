@@ -11,21 +11,34 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
+
+use function collect;
 
 class Idea extends Model
 {
     /** @use HasFactory<IdeaFactory> */
     use HasFactory;
 
-    protected $casts = [
-        'links' => AsArrayObject::class,
-        'status' => IdeaStatus::class,
-    ];
-
     protected $attributes = [
         'status' => IdeaStatus::PENDING,
         'links' => '[]',
     ];
+
+    public static function statusCounts(User $user): Collection
+    {
+        $counts = $user
+            ->ideas()
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        return collect(IdeaStatus::cases())
+            ->mapWithKeys(fn ($status) => [
+                $status->value => $counts->get($status->value, 0),
+            ])
+            ->put('all', $user->ideas()->count());
+    }
 
     public function user(): BelongsTo
     {
@@ -35,5 +48,16 @@ class Idea extends Model
     public function steps(): HasMany
     {
         return $this->hasMany(Step::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'links' => AsArrayObject::class,
+            'status' => IdeaStatus::class,
+        ];
     }
 }

@@ -1,5 +1,5 @@
-@php use App\Models\Idea; @endphp
-@props(['ideas'])
+@php use App\IdeaStatus;use App\Models\Idea; @endphp
+@props(['ideas', 'statusCounts'])
 
 <x-layout>
     <div>
@@ -7,6 +7,23 @@
             <h1 class="text-2xl font-bold text-foreground">Ideas</h1>
             <p class="text-muted-foreground text-sm mt-2">Capture your thoughts. Make a plan</p>
         </header>
+
+        <div>
+            <a
+                href="/ideas"
+                class="btn {{ request()->has('status') ? 'btn-outlined' : '' }}"
+            >
+                All <span class="text-xs pl-3">{{ $statusCounts['all'] }}</span>
+            </a>
+            @foreach(IdeaStatus::cases() as $status)
+                <a
+                    href="/ideas?status={{ $status->value }}"
+                    class="btn {{ request('status') === $status->value ? '' : 'btn-outlined'}}"
+                >
+                    {{ $status->label() }} <span class="text-xs pl-3">{{ $statusCounts->get($status->value) }}</span>
+                </a>
+            @endforeach
+        </div>
 
         <div class="mt-10 text-muted-foreground">
             <div class="grid md:grid-cols-2 gap-6">

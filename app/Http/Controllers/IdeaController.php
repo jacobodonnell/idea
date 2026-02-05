@@ -8,8 +8,8 @@ use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\Models\Idea;
 use Auth;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+
 use function view;
 
 class IdeaController extends Controller
@@ -17,12 +17,16 @@ class IdeaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): \Illuminate\View\View|View|Factory
+    public function index(Request $request)
     {
-        $ideas = Auth::user()->ideas()->get();
+        $ideas = Auth::user()
+            ->ideas()
+            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
+            ->get();
 
         return view('idea.index', [
-            'ideas' => $ideas
+            'ideas' => $ideas,
+            'statusCounts' => Idea::statusCounts(Auth::user()),
         ]);
     }
 
