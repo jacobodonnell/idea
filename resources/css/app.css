@@ -21,3 +21,7 @@
     --color-input: oklch(0.24 0 0);
     --color-muted-foreground: oklch(0.6 0 0);
 }
+
+[x-cloak] {
+    display: none !important;
+}
