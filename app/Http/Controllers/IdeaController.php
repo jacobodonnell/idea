@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
+use App\IdeaStatus;
 use App\Models\Idea;
 use Auth;
 use Illuminate\Http\Request;
@@ -19,9 +20,11 @@ class IdeaController extends Controller
      */
     public function index(Request $request)
     {
+        $status = IdeaStatus::tryFrom($request->status);
+
         $ideas = Auth::user()
             ->ideas()
-            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
+            ->when($status, fn ($query, $status) => $query->where('status', $status->value))
             ->get();
 
         return view('idea.index', [
