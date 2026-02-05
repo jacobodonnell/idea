@@ -7,7 +7,7 @@
             <x-form.field name="email" label="Email" type="email" autocomplete="email"/>
             <x-form.field name="password" label="Password" type="password"/>
 
-            <button type="submit" class="btn mt-2 h-10 w-full">Create Account</button>
+            <button type="submit" class="btn mt-2 h-10 w-full" data-test="register-button">Create Account</button>
         </form>
     </x-form>
 </x-layout>

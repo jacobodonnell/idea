@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Auth;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-
-use function redirect;
-use function view;
+use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
         return view('auth.login');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $attributes = $request->validate([
-            'email' => ['email', 'required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'max:255'],
         ]);
 
@@ -36,13 +32,9 @@ class SessionsController extends Controller
         $request->session()->regenerate();
 
         return redirect()->intended('/')->with('success', 'You are now logged in.');
-
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy()
+    public function destroy(): RedirectResponse
     {
         Auth::logout();
 
