@@ -8,9 +8,12 @@ use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\IdeaStatus;
 use App\Models\Idea;
-use Auth;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+use function to_route;
 use function view;
 
 class IdeaController extends Controller
@@ -20,7 +23,7 @@ class IdeaController extends Controller
      */
     public function index(Request $request)
     {
-        $status = IdeaStatus::tryFrom($request->status);
+        $status = IdeaStatus::tryFrom($request->query('status', ''));
 
         $ideas = Auth::user()
             ->ideas()
@@ -52,9 +55,11 @@ class IdeaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Idea $idea): void
+    public function show(Idea $idea): View
     {
-        //
+        return view('idea.show', [
+            'idea' => $idea,
+        ]);
     }
 
     /**
@@ -76,8 +81,11 @@ class IdeaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Idea $idea): void
+    public function destroy(Idea $idea): RedirectResponse
     {
-        //
+        $idea->delete();
+
+        return to_route('idea.index')
+            ->with('success', "You successfully deleted {$idea->title}");
     }
 }

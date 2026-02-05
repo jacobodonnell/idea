@@ -14,7 +14,7 @@
 
     @session('success')
     <div
-        class="bg-primary px-4 py-3 absolute bottom-4 right-4 rounded-lg"
+        class="bg-primary px-4 py-3 fixed bottom-4 right-4 rounded-lg"
         x-data="{ show: true }"
         x-init="setTimeout(() => show = false, 3000)"
         x-show="show"
