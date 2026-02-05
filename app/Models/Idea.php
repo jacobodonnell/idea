@@ -24,6 +24,7 @@ class Idea extends Model
 
     protected $attributes = [
         'status' => IdeaStatus::PENDING,
+        'links' => '[]',
     ];
 
     public function user(): BelongsTo
