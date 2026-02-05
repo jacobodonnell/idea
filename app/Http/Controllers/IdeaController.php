@@ -7,15 +7,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\Models\Idea;
+use Auth;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use function view;
 
 class IdeaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): void
+    public function index(): \Illuminate\View\View|View|Factory
     {
-        //
+        $ideas = Auth::user()->ideas()->get();
+
+        return view('idea.index', [
+            'ideas' => $ideas
+        ]);
     }
 
     /**
