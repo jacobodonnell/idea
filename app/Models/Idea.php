@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\IdeaStatus;
@@ -16,8 +18,8 @@ class Idea extends Model
     use HasFactory;
 
     protected $casts = [
-        'links'  => AsArrayObject::class,
-        'status' => IdeaStatus::class
+        'links' => AsArrayObject::class,
+        'status' => IdeaStatus::class,
     ];
 
     protected $attributes = [

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Idea;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 use function fake;
 
 /**
@@ -20,10 +21,10 @@ class IdeaFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'     => User::factory(),
-            'title'       => fake()->sentence(),
+            'user_id' => User::factory(),
+            'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
-            'links'       => [fake()->url()]
+            'links' => [fake()->url()],
         ];
     }
 }

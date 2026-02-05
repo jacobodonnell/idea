@@ -19,9 +19,9 @@ class StepFactory extends Factory
     public function definition(): array
     {
         return [
-            'idea_id'     => Idea::factory(),
+            'idea_id' => Idea::factory(),
             'description' => fake()->sentence(),
-            'completed'   => false
+            'completed' => false,
         ];
     }
 }
