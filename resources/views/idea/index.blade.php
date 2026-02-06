@@ -88,6 +88,7 @@
                                         name="status"
                                         value="{{ $status->value }}"
                                         class="peer sr-only"
+                                        data-test="button-status-{{ $status->value }}"
                                         @checked($loop->first)
                                     >
                                     <span
