@@ -4,7 +4,7 @@
             <a href="{{ route('idea.index') }}"
                class="flex items-center gap-x-2 text-sm font-medium hover:text-foreground/75 transition-colors duration-300"
             >
-                <x-icons.arrow-back />
+                <x-icons.arrow-back/>
                 Back to Ideas
             </a>
 
@@ -45,6 +45,36 @@
                     {{ $idea->description }}
                 </div>
             </x-card>
+
+            @if($idea->steps->count())
+                <div>
+                    <h3 class="font-bold text-xl mt-6">Actionable Steps</h3>
+
+                    <div class="mt-4 space-y-2">
+                        @foreach($idea->steps as $step)
+                            <x-card is="div">
+                                <div class="flex items-center gap-x-3">
+                                    <form method="POST" action="{{ route('step.update', $step) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button
+                                            class="size-5 flex items-center justify-center rounded-lg text-primary-foreground border  {{ $step->completed ? 'bg-primary' : 'border border-primary'}}"
+                                            type="submit"
+                                            role="checkbox"
+                                        >
+                                            &check;
+                                        </button>
+                                    </form>
+                                    <span
+                                    @class(['line-through text-muted-foreground' => $step->completed])
+                                    >{{ $step->description }}</span>
+                                </div>
+                            </x-card>
+                        @endforeach
+                    </div>
+
+                </div>
+            @endif
 
             @if ($idea->links->count())
                 <div>

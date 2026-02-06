@@ -65,9 +65,14 @@
             <form
                 x-data="{
                  newLink: '',
+                 newStep: '',
                  links: [],
+                 steps: [],
                  removeLink(indexToRemove) {
                     this.links.splice(indexToRemove, 1);
+                 },
+                 removeStep(indexToRemove) {
+                    this.steps.splice(indexToRemove, 1);
                  }
                 }"
                 action="{{ route('idea.store') }}"
@@ -118,8 +123,56 @@
 
                     <div>
                         <fieldset class="space-y-3">
+                            <legend class="label">Actionable Steps</legend>
+
+                            <template x-for="(step, index) in steps" :key="step">
+                                <div class="flex gap-x-2 items-center">
+                                    <input
+                                        type="text"
+                                        class="input"
+                                        name="steps[]"
+                                        x-model="step"
+                                    >
+                                    <button
+                                        type="button"
+                                        @click="removeStep(index)"
+                                        :aria-label="'Remove ' + step"
+                                        class="form-muted-icon"
+                                    >
+                                        <x-icons.close/>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <div class="flex gap-x-2 items-center">
+                                <input
+                                    x-model="newStep"
+                                    type="text"
+                                    id="new-step"
+                                    data-test="new-step"
+                                    placeholder="What needs to be done?"
+                                    class="input flex-1"
+                                    spellcheck="true"
+                                >
+                                <button
+                                    type="button"
+                                    @click="steps.push(newStep.trim()); newStep = ''"
+                                    :disabled="newStep.trim().length === 0"
+                                    aria-label="Add new step"
+                                    class="form-muted-icon"
+                                    data-test="add-new-step-button"
+                                >
+                                    <x-icons.close class="rotate-45"/>
+                                </button>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div>
+                        <fieldset class="space-y-3">
                             <legend class="label">Links</legend>
 
+                            {{-- Alpine.js x-for directive - IDE may flag as error but is valid syntax --}}
                             <template x-for="(link, index) in links" :key="link">
                                 <div class="flex gap-x-2 items-center">
                                     <input
