@@ -1,6 +1,7 @@
 @props(['name', 'title'])
 <div
     x-data="{ show: false, name: @js($name) }"
+    @close-modal.window="show = false"
     x-show="show"
     @open-modal.window="if ($event.detail === name) show = true"
     @keydown.esc.window="if (show) show = false"
@@ -18,12 +19,20 @@
     aria-labelledby="modal-{{ $name }}-title"
     tabindex="-1"
 >
-    <x-card @click.outside="show = false">
-        <div>
+    <x-card
+        @click.outside="show = false"
+        class="shadow-xl max-w-2xl w-full max-h-[80dvh] overflow-auto"
+    >
+        <div class="flex justify-between items-center">
             <h2 id="modal-{{ $name }}-title" class="text-xl font-bold">{{ $title }}</h2>
+
+            <button @click="show = false" aria-label="Close modal"
+                    class="hover:text-red-400/80 transition-colors duration-250">
+                <x-icons.close/>
+            </button>
         </div>
 
-        <div>
+        <div class="mt-4">
             {{ $slot }}
         </div>
     </x-card>

@@ -21,13 +21,14 @@ class IdeaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $status = IdeaStatus::tryFrom($request->query('status', ''));
 
         $ideas = Auth::user()
             ->ideas()
             ->when($status, fn ($query, $status) => $query->where('status', $status->value))
+            ->latest()
             ->get();
 
         return view('idea.index', [
@@ -37,17 +38,19 @@ class IdeaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created resource in storage.
      */
-    public function create(): void
+    public function store(StoreIdeaRequest $request): RedirectResponse
     {
-        //
+        Auth::user()->ideas()->create($request->validated());
+
+        return to_route('idea.index')->with('success', 'Idea created!');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Show the form for creating a new resource.
      */
-    public function store(StoreIdeaRequest $request): void
+    public function create(): void
     {
         //
     }
