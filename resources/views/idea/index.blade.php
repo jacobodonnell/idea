@@ -12,6 +12,7 @@
                 @click="$dispatch('open-modal', 'create-idea')"
                 is="button"
                 type="button"
+                data-test="create-idea-button"
                 aria-label="Create new idea"
                 class="mt-10 cursor-pointer h-32 w-full text-left flex"
             >
@@ -62,9 +63,6 @@
 
         <x-modal name="create-idea" title="Create New Idea">
             <form
-                x-data="{
-                    status: 'pending'
-                }"
                 action="{{ route('idea.store') }}"
                 method="POST"
             >
@@ -79,26 +77,29 @@
                         required
                     />
 
-                    <div class="space-y-2">
-                        <label for="status" class="label">Status</label>
+                    <fieldset class="space-y-2">
+                        <legend class="label">Status</legend>
 
                         <div class="flex gap-x-3">
                             @foreach(IdeaStatus::cases() as $status)
-                                <button
-                                    type="button"
-                                    @click="status = @js($status->value)"
-                                    class="btn flex-1 h-10"
-                                    :class="{'btn-outlined': status !== @js($status->value)}"
-                                >
-                                    {{ $status->label() }}
-                                </button>
+                                <label class="flex-1">
+                                    <input
+                                        type="radio"
+                                        name="status"
+                                        value="{{ $status->value }}"
+                                        class="peer sr-only"
+                                        @checked($loop->first)
+                                    >
+                                    <span
+                                        class="btn btn-outlined flex items-center justify-center py-5 peer-checked:bg-primary peer-checked:text-primary-foreground peer-checked:border-transparent peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 cursor-pointer">
+                                        {{ $status->label() }}
+                                    </span>
+                                </label>
                             @endforeach
-
-                            <input type="hidden" name="status" :value="status">
-
-                            <x-form.error name="status"/>
                         </div>
-                    </div>
+
+                        <x-form.error name="status"/>
+                    </fieldset>
 
                     <x-form.field
                         label="Description"
