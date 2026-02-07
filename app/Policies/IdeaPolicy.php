@@ -10,58 +10,15 @@ use App\Models\User;
 class IdeaPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine if the given user is the owner of the specified idea.
+     *
+     * @param  User  $user  The user instance to check ownership.
+     * @param  Idea  $idea  The idea instance to verify against the user.
+     *
+     * @return bool Returns true if the user is the owner of the idea, otherwise false.
      */
-    public function viewAny(User $user): bool
+    public function workWith(User $user, Idea $idea): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Idea $idea): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Idea $idea): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Idea $idea): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Idea $idea): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Idea $idea): bool
-    {
-        return false;
+        return $idea->user->is($user);
     }
 }

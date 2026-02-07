@@ -13,7 +13,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 use function to_route;
 use function view;
 
@@ -27,13 +26,13 @@ class IdeaController extends Controller
         $status = IdeaStatus::tryFrom($request->query('status', ''));
 
         $ideas = Auth::user()
-            ->ideas()
-            ->when($status, fn ($query, $status) => $query->where('status', $status->value))
-            ->latest()
-            ->get();
+                     ->ideas()
+                     ->when($status, fn($query, $status) => $query->where('status', $status->value))
+                     ->latest()
+                     ->get();
 
         return view('idea.index', [
-            'ideas' => $ideas,
+            'ideas'        => $ideas,
             'statusCounts' => Idea::statusCounts(Auth::user()),
         ]);
     }
@@ -69,6 +68,7 @@ class IdeaController extends Controller
      */
     public function show(Idea $idea): View
     {
+//        Gate::authorize('work-with', $idea);
 
         return view('idea.show', [
             'idea' => $idea,
@@ -88,6 +88,8 @@ class IdeaController extends Controller
      */
     public function destroy(Idea $idea): RedirectResponse
     {
+        // authorize that this is allowed
+
         $idea->delete();
 
         return to_route('idea.index')

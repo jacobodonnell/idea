@@ -47,11 +47,14 @@
                 <div class="text-muted-foreground text-sm">{{ $idea->created_at->diffForHumans() }}</div>
             </div>
 
-            <x-card>
-                <div class="text-foreground max-w-none cursor-pointer">
-                    {{ $idea->description }}
-                </div>
-            </x-card>
+            @if($idea->description !== null)
+                <x-card>
+                    <div class="text-foreground max-w-none cursor-pointer">
+                        {{ $idea->description }}
+                    </div>
+                </x-card>
+            @endif
+
 
             @if($idea->steps->count())
                 <div>
