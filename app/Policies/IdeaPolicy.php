@@ -14,7 +14,6 @@ class IdeaPolicy
      *
      * @param  User  $user  The user instance to check ownership.
      * @param  Idea  $idea  The idea instance to verify against the user.
-     *
      * @return bool Returns true if the user is the owner of the idea, otherwise false.
      */
     public function workWith(User $user, Idea $idea): bool

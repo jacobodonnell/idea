@@ -27,4 +27,15 @@ class IdeaFactory extends Factory
             'links' => [fake()->url()],
         ];
     }
+
+    /**
+     * Create an idea with steps.
+     */
+    public function withSteps(int $count = 3): static
+    {
+        return $this->has(
+            \App\Models\Step::factory()->count($count),
+            'steps'
+        );
+    }
 }

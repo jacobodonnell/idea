@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\CreateIdea;
+use App\Actions\UpdateIdea;
 use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\IdeaStatus;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 use function to_route;
 use function view;
 
@@ -26,13 +28,13 @@ class IdeaController extends Controller
         $status = IdeaStatus::tryFrom($request->query('status', ''));
 
         $ideas = Auth::user()
-                     ->ideas()
-                     ->when($status, fn($query, $status) => $query->where('status', $status->value))
-                     ->latest()
-                     ->get();
+            ->ideas()
+            ->when($status, fn ($query, $status) => $query->where('status', $status->value))
+            ->latest()
+            ->get();
 
         return view('idea.index', [
-            'ideas'        => $ideas,
+            'ideas' => $ideas,
             'statusCounts' => Idea::statusCounts(Auth::user()),
         ]);
     }
@@ -58,9 +60,11 @@ class IdeaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateIdeaRequest $request, Idea $idea): void
+    public function update(UpdateIdeaRequest $request, Idea $idea, UpdateIdea $action): RedirectResponse
     {
-        //
+        $action->handle($idea, $request->validated());
+
+        return to_route('idea.index')->with('success', 'Idea updated!');
     }
 
     /**
@@ -68,7 +72,7 @@ class IdeaController extends Controller
      */
     public function show(Idea $idea): View
     {
-//        Gate::authorize('work-with', $idea);
+        //        Gate::authorize('work-with', $idea);
 
         return view('idea.show', [
             'idea' => $idea,

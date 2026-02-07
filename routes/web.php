@@ -12,10 +12,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/ideas', [IdeaController::class, 'index'])->name('idea.index');
     Route::post('/ideas', [IdeaController::class, 'store'])->name('idea.store');
     Route::get('/ideas/{idea}', [IdeaController::class, 'show'])
-         ->name('idea.show')
-         ->middleware(['auth'])
-         ->can('work-with', 'idea');
+        ->name('idea.show')
+        ->middleware(['auth'])
+        ->can('work-with', 'idea');
     Route::delete('/ideas/{idea}', [IdeaController::class, 'destroy'])->name('idea.destroy');
+    Route::patch('/ideas/{idea}', [IdeaController::class, 'update'])->name('idea.update')->can('work-with', 'idea');
 
     Route::patch('/steps/{step}', [StepController::class, 'update'])->name('step.update');
 });
