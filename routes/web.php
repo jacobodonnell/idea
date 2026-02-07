@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\IdeaController;
+use App\Http\Controllers\IdeaImageController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\StepController;
@@ -16,6 +17,7 @@ Route::middleware('auth')->group(function () {
         ->middleware(['auth'])
         ->can('work-with', 'idea');
     Route::delete('/ideas/{idea}', [IdeaController::class, 'destroy'])->name('idea.destroy');
+    Route::delete('/ideas/{idea}/image', [IdeaImageController::class, 'destroy'])->name('idea.image.destroy')->can('work-with', 'idea');
     Route::patch('/ideas/{idea}', [IdeaController::class, 'update'])->name('idea.update')->can('work-with', 'idea');
 
     Route::patch('/steps/{step}', [StepController::class, 'update'])->name('step.update');
