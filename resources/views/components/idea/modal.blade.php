@@ -9,7 +9,11 @@
                  newLink: '',
                  newStep: '',
                  links: @js(old('links', $idea->links ?? [])),
-                 steps: @js(old('steps', $idea->exists ? $idea->steps->pluck('description')->toArray() : [])),
+                 steps: @js(old('steps', $idea->exists ? $idea->steps->map(fn($step) => [
+                     'id' => $step->id,
+                     'description' => $step->description,
+                     'completed' => $step->completed
+                 ])->toArray() : [])),
                  imagePreview: null,
                  imageRemoved: false,
                  removeLink(indexToRemove) {
@@ -124,7 +128,7 @@
                     </div>
                 @endif
 
-                <input type="hidden" name="remove_image" :value="imageRemoved ? '1' : '0'">
+                <input type="hidden" name="remove_image" value="0" :value="imageRemoved ? '1' : '0'">
                 <input type="file" name="image" accept="image/*" @change="previewImage($event)" x-ref="imageInput">
                 <x-form.error name="image"/>
             </div>
@@ -133,18 +137,21 @@
                 <fieldset class="space-y-3">
                     <legend class="label">Actionable Steps</legend>
 
-                    <template x-for="(step, index) in steps" :key="step">
+                    <template x-for="(step, index) in steps" :key="`step-${index}`">
                         <div class="flex gap-x-2 items-center">
+                            <input type="hidden" :name="`steps[${index}][id]`" :value="step.id || ''">
+                            <input type="hidden" :name="`steps[${index}][completed]`"
+                                   :value="step.completed ? '1' : '0'">
                             <input
                                 type="text"
                                 class="input"
-                                name="steps[]"
-                                x-model="step"
+                                :name="`steps[${index}][description]`"
+                                x-model="step.description"
                             >
                             <button
                                 type="button"
                                 @click="removeStep(index)"
-                                :aria-label="'Remove ' + step"
+                                :aria-label="'Remove ' + step.description"
                                 class="form-muted-icon"
                             >
                                 <x-icons.close/>
@@ -164,7 +171,7 @@
                         >
                         <button
                             type="button"
-                            @click="steps.push(newStep.trim()); newStep = ''"
+                            @click="steps.push({ id: null, description: newStep.trim(), completed: false }); newStep = ''"
                             :disabled="newStep.trim().length === 0"
                             aria-label="Add new step"
                             class="form-muted-icon"
@@ -232,7 +239,9 @@
                     class="hover:opacity-70 transition-opacity duration-75">
                     Cancel
                 </button>
-                <button type="submit" class="btn" data-test="create-idea-submit">Create</button>
+                <button type="submit" class="btn" data-test="create-idea-submit">
+                    {{ $idea->exists ? 'Submit Edit' : 'Create' }}
+                </button>
             </div>
         </div>
     </form>

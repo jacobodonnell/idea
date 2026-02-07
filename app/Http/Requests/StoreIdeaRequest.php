@@ -20,6 +20,29 @@ class StoreIdeaRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('steps')) {
+            $this->merge([
+                'steps' => collect($this->steps)->map(function ($step) {
+                    // Convert string format to object format for backward compatibility
+                    if (is_string($step)) {
+                        return [
+                            'id' => null,
+                            'description' => $step,
+                            'completed' => false,
+                        ];
+                    }
+
+                    return $step;
+                })->all(),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -33,7 +56,9 @@ class StoreIdeaRequest extends FormRequest
             'links' => ['nullable', 'array'],
             'links.*' => ['url', 'max:255'],
             'steps' => ['nullable', 'array'],
-            'steps.*' => ['string', 'max:255'],
+            'steps.*.id' => ['nullable', 'integer', 'exists:steps,id'],
+            'steps.*.description' => ['required', 'string', 'max:255'],
+            'steps.*.completed' => ['nullable', 'boolean'],
             'image' => ['nullable', 'image', 'max:5120'],
         ];
     }

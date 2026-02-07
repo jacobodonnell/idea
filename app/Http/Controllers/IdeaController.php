@@ -64,7 +64,7 @@ class IdeaController extends Controller
     {
         $action->handle($idea, $request->validated());
 
-        return to_route('idea.index')->with('success', 'Idea updated!');
+        return to_route('idea.store', [$idea])->with('success', 'Idea updated!');
     }
 
     /**

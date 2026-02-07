@@ -30,7 +30,16 @@ class CreateIdea
 
             if ($attributes['steps'] ?? false) {
                 $idea->steps()->createMany(
-                    collect($attributes['steps'])->map(fn ($step) => ['description' => $step])->all()
+                    collect($attributes['steps'])->map(function ($step): array {
+                        if (is_string($step)) {
+                            return ['description' => $step, 'completed' => false];
+                        }
+
+                        return [
+                            'description' => $step['description'],
+                            'completed' => false,
+                        ];
+                    })->all()
                 );
             }
         });
