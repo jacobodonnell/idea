@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateIdea;
 use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\IdeaStatus;
@@ -12,7 +13,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use function collect;
+
 use function to_route;
 use function view;
 
@@ -26,13 +27,13 @@ class IdeaController extends Controller
         $status = IdeaStatus::tryFrom($request->query('status', ''));
 
         $ideas = Auth::user()
-                     ->ideas()
-                     ->when($status, fn($query, $status) => $query->where('status', $status->value))
-                     ->latest()
-                     ->get();
+            ->ideas()
+            ->when($status, fn ($query, $status) => $query->where('status', $status->value))
+            ->latest()
+            ->get();
 
         return view('idea.index', [
-            'ideas'        => $ideas,
+            'ideas' => $ideas,
             'statusCounts' => Idea::statusCounts(Auth::user()),
         ]);
     }
@@ -40,18 +41,9 @@ class IdeaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreIdeaRequest $request): RedirectResponse
+    public function store(StoreIdeaRequest $request, CreateIdea $action)
     {
-        $idea = Auth::user()->ideas()->create($request->safe()->except('steps', 'image'));
-
-        $idea->steps()->createMany(
-            collect($request->steps)->map(fn($step) => ['description' => $step])
-        );
-
-        $imagePath = $request->image->store('ideas', 'public');
-        $idea->update([
-            'image_path' => $imagePath
-        ]);
+        $action->handle($request->validated());
 
         return to_route('idea.index')->with('success', 'Idea created!');
     }

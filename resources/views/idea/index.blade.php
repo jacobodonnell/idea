@@ -92,6 +92,7 @@
                     <x-form.field
                         label="Title"
                         name="title"
+                        data-test="title"
                         placeholder="Enter an idea for your title"
                         autofocus
                         required
@@ -102,7 +103,7 @@
 
                         <div class="flex gap-x-3">
                             @foreach(IdeaStatus::cases() as $status)
-                                <label class="flex-1">
+                                <label class="flex-1" data-text="label-status-{{ $status->value }}">
                                     <input
                                         type="radio"
                                         name="status"
@@ -125,6 +126,7 @@
                     <x-form.field
                         label="Description"
                         name="description"
+                        data-test="description"
                         type="textarea"
                         placeholder="Describe your idea..."
                     />
@@ -132,6 +134,7 @@
                     <div class="space-y-2">
                         <label for="image" class="label">Featured Image</label>
                         <input type="file" name="image" accept="image/*">
+                        <x-form.error name="image"/>
                         <x-form.error name="image"/>
                     </div>
 
@@ -238,7 +241,7 @@
                             class="hover:opacity-70 transition-opacity duration-75">
                             Cancel
                         </button>
-                        <button type="submit" class="btn">Create</button>
+                        <button type="submit" class="btn" data-test="create-idea-submit">Create</button>
                     </div>
                 </div>
             </form>
