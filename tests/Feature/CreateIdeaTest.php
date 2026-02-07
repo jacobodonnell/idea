@@ -74,7 +74,7 @@ it('edits an existing idea', function () {
         'status' => IdeaStatus::COMPLETED->value,
         'links' => ['https://laravel.com', 'https://laracasts.com'],
         'steps' => ['Step one', 'Step two'],
-    ])->assertRedirect(route('idea.index'))
+    ])->assertRedirect(route('idea.show', $idea))
         ->assertSessionHas('success', 'Idea updated!');
 
     $idea->refresh();
@@ -127,7 +127,7 @@ it('updates an idea and replaces the existing image', function () {
         'title' => $idea->title,
         'status' => $idea->status->value,
         'image' => $newImage,
-    ])->assertRedirect(route('idea.index'))
+    ])->assertRedirect(route('idea.show', $idea))
         ->assertSessionHas('success', 'Idea updated!');
 
     $idea->refresh();
@@ -153,7 +153,7 @@ it('removes an image when remove_image flag is set', function () {
         'title' => $idea->title,
         'status' => $idea->status->value,
         'remove_image' => '1',
-    ])->assertRedirect(route('idea.index'))
+    ])->assertRedirect(route('idea.show', $idea))
         ->assertSessionHas('success', 'Idea updated!');
 
     $idea->refresh();
@@ -182,7 +182,7 @@ it('uploads new image even when remove_image flag is set', function () {
         'status' => $idea->status->value,
         'remove_image' => '1',
         'image' => $newImage,
-    ])->assertRedirect(route('idea.index'))
+    ])->assertRedirect(route('idea.show', $idea))
         ->assertSessionHas('success', 'Idea updated!');
 
     $idea->refresh();
@@ -208,7 +208,7 @@ it('keeps existing image when remove_image is 0 or not set', function () {
         'title' => 'Updated Title',
         'status' => $idea->status->value,
         'remove_image' => '0',
-    ])->assertRedirect(route('idea.index'))
+    ])->assertRedirect(route('idea.show', $idea))
         ->assertSessionHas('success', 'Idea updated!');
 
     $idea->refresh();
@@ -251,4 +251,106 @@ it('rejects invalid remove_image values', function () {
         'status' => $idea->status->value,
         'remove_image' => 'true', // invalid - must be '0' or '1'
     ])->assertSessionHasErrors('remove_image');
+});
+
+it('updates existing step description', function () {
+    $user = User::factory()->create();
+    $idea = Idea::factory()->for($user)->withSteps(2)->create();
+    $existingSteps = $idea->steps;
+
+    actingAs($user)->patch(route('idea.update', $idea), [
+        'title' => $idea->title,
+        'status' => $idea->status->value,
+        'steps' => [
+            [
+                'id' => $existingSteps[0]->id,
+                'description' => 'Updated first step',
+                'completed' => false,
+            ],
+            [
+                'id' => $existingSteps[1]->id,
+                'description' => 'Updated second step',
+                'completed' => false,
+            ],
+        ],
+    ])->assertRedirect();
+
+    $idea->refresh();
+
+    expect($idea->steps)->toHaveCount(2);
+    expect($idea->steps[0]->id)->toBe($existingSteps[0]->id);
+    expect($idea->steps[0]->description)->toBe('Updated first step');
+    expect($idea->steps[1]->id)->toBe($existingSteps[1]->id);
+    expect($idea->steps[1]->description)->toBe('Updated second step');
+});
+
+it('adds new steps while keeping existing ones', function () {
+    $user = User::factory()->create();
+    $idea = Idea::factory()->for($user)->withSteps(1)->create();
+    $existingStep = $idea->steps->first();
+
+    actingAs($user)->patch(route('idea.update', $idea), [
+        'title' => $idea->title,
+        'status' => $idea->status->value,
+        'steps' => [
+            [
+                'id' => $existingStep->id,
+                'description' => $existingStep->description,
+                'completed' => false,
+            ],
+            [
+                'id' => null,
+                'description' => 'Brand new step',
+                'completed' => false,
+            ],
+        ],
+    ])->assertRedirect();
+
+    $idea->refresh();
+
+    expect($idea->steps)->toHaveCount(2);
+    expect($idea->steps->pluck('description')->toArray())->toBe([
+        $existingStep->description,
+        'Brand new step',
+    ]);
+});
+
+it('handles adding updating and deleting steps simultaneously', function () {
+    $user = User::factory()->create();
+    $idea = Idea::factory()->for($user)->withSteps(3)->create();
+    $originalSteps = $idea->steps;
+
+    actingAs($user)->patch(route('idea.update', $idea), [
+        'title' => $idea->title,
+        'status' => $idea->status->value,
+        'steps' => [
+            // Keep and update first step
+            [
+                'id' => $originalSteps[0]->id,
+                'description' => 'Updated first step',
+                'completed' => true,
+            ],
+            // Delete second step (by omitting it)
+            // Keep third step unchanged
+            [
+                'id' => $originalSteps[2]->id,
+                'description' => $originalSteps[2]->description,
+                'completed' => false,
+            ],
+            // Add new fourth step
+            [
+                'id' => null,
+                'description' => 'Brand new fourth step',
+                'completed' => false,
+            ],
+        ],
+    ])->assertRedirect(route('idea.show', $idea));
+
+    $idea->refresh();
+
+    expect($idea->steps)->toHaveCount(3);
+    expect($idea->steps[0]->description)->toBe('Updated first step');
+    expect($idea->steps[0]->completed)->toBeTruthy();
+    expect($idea->steps[1]->id)->toBe($originalSteps[2]->id);
+    expect($idea->steps[2]->description)->toBe('Brand new fourth step');
 });
