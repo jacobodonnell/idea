@@ -9,8 +9,12 @@
             </a>
 
             <div class="flex gap-x-3 items-center">
-                <button class="btn btn-outlined">
-                    <x-icons.edit class=""/>
+                <button
+                    x-data
+                    class="btn btn-outlined"
+                    @click="$dispatch('open-modal', 'edit-idea')"
+                >
+                    <x-icons.edit/>
                     Edit Idea
                 </button>
                 <form action="{{ route('idea.destroy', $idea) }}" method="POST">
@@ -104,5 +108,7 @@
                 </div>
             @endif
         </div>
+
+        <x-idea.modal :idea="$idea"/>
     </div>
 </x-layout>
