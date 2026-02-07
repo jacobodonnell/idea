@@ -18,17 +18,15 @@
                  removeStep(indexToRemove) {
                     this.steps.splice(indexToRemove, 1);
                  },
+                 removeImage() {
+                    this.imageRemoved = true;
+                 },
                  previewImage(event) {
                     const file = event.target.files[0];
                     if (file) {
                         this.imagePreview = URL.createObjectURL(file);
-                        this.imageRemoved = false;
+                        this.imageRemoved = false; // Reset flag if user selects new image
                     }
-                 },
-                 removeImage() {
-                    this.imagePreview = null;
-                    this.imageRemoved = true;
-                    this.$refs.imageInput.value = '';
                  }
                 }"
         action="{{ $idea->exists ? route('idea.update', $idea) : route('idea.store') }}"
@@ -97,7 +95,7 @@
                         <img :src="imagePreview" alt="New image preview" class="max-w-xs rounded">
                         <button
                             type="button"
-                            @click="removeImage()"
+                            @click="imagePreview = null; $refs.imageInput.value = ''"
                             class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
                             aria-label="Remove image"
                         >
@@ -107,11 +105,12 @@
                     <p class="text-sm text-muted-foreground mt-1">New image preview</p>
                 </div>
 
-                {{-- Show current image if exists and not removed --}}
+                {{-- Show current image if exists --}}
                 @if($idea->image_path)
                     <div x-show="!imagePreview && !imageRemoved" class="mb-2">
                         <div class="relative inline-block">
-                            <img src="{{ asset('storage/' . $idea->image_path) }}" alt="Current featured image" class="max-w-xs rounded">
+                            <img src="{{ asset('storage/' . $idea->image_path) }}" alt="Current featured image"
+                                 class="max-w-xs rounded">
                             <button
                                 type="button"
                                 @click="removeImage()"
@@ -125,8 +124,8 @@
                     </div>
                 @endif
 
-                <input type="file" name="image" accept="image/*" @change="previewImage($event)" x-ref="imageInput">
                 <input type="hidden" name="remove_image" :value="imageRemoved ? '1' : '0'">
+                <input type="file" name="image" accept="image/*" @change="previewImage($event)" x-ref="imageInput">
                 <x-form.error name="image"/>
             </div>
 

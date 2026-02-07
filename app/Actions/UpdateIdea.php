@@ -18,12 +18,16 @@ class UpdateIdea
             'title', 'description', 'status', 'links',
         ])->toArray();
 
-        if ($attributes['remove_image'] ?? false) {
+        // Check if user wants to remove the image
+        if (isset($attributes['remove_image']) && $attributes['remove_image'] === '1') {
             if ($idea->image_path) {
                 Storage::disk('public')->delete($idea->image_path);
             }
             $data['image_path'] = null;
-        } elseif ($attributes['image'] ?? false) {
+        }
+
+        // Handle new image upload (this replaces any existing image)
+        if (isset($attributes['image'])) {
             if ($idea->image_path) {
                 Storage::disk('public')->delete($idea->image_path);
             }

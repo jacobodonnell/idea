@@ -35,7 +35,7 @@ class UpdateIdeaRequest extends FormRequest
             'steps' => ['nullable', 'array'],
             'steps.*' => ['string', 'max:255'],
             'image' => ['nullable', 'image', 'max:5120'],
-            'remove_image' => ['nullable', 'boolean'],
+            'remove_image' => ['nullable', 'in:0,1'],
         ];
     }
 }
