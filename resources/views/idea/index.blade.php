@@ -44,6 +44,13 @@
                         /** @var Idea $idea */
                     @endphp
                     <x-card href="{{ route('idea.show', $idea) }}">
+                        @if($idea->image_path)
+                            <div class="mb-4 -mx-4 -mt-4 rounded-t-lg overflow-hidden">
+                                <img
+                                    class="w-full h-auto object-cover max-h-80"
+                                    src="{{ asset('storage/' . $idea->image_path) }}" alt="{{ $idea->title }}"/>
+                            </div>
+                        @endif
                         <h3 class="text-foreground text-lg">{{ $idea->title }}</h3>
                         <x-idea.status-label status="{{ $idea->status }}">
                             {{ $idea->status->label() }}
@@ -77,6 +84,7 @@
                 }"
                 action="{{ route('idea.store') }}"
                 method="POST"
+                enctype="multipart/form-data"
             >
                 @csrf
 
@@ -120,6 +128,12 @@
                         type="textarea"
                         placeholder="Describe your idea..."
                     />
+
+                    <div class="space-y-2">
+                        <label for="image" class="label">Featured Image</label>
+                        <input type="file" name="image" accept="image/*">
+                        <x-form.error name="image"/>
+                    </div>
 
                     <div>
                         <fieldset class="space-y-3">
